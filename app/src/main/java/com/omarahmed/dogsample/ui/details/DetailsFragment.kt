@@ -40,6 +40,8 @@ class DetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binds.btnBack.setOnClickListener { activity?.onBackPressed() }
+
         Glide.with(binds.imgDog)
             .load(args.dog.image)
             .placeholder(R.drawable.placeholder_dog)
