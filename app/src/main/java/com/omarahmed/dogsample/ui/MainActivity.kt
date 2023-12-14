@@ -14,37 +14,9 @@ import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
-    private val scope = MainScope()
-    private lateinit var getAllDogsUseCase: GetAllDogsUseCase
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        getAllDogsUseCase = (application as App).appComponent.provideGetAllDogsUseCase()
-
-        findViewById<Button>(R.id.btnGet).setOnClickListener { getDogs() }
-
-    }
-
-    private fun getDogs() {
-        scope.launch {
-            when (val result = getAllDogsUseCase.invoke()) {
-                is UCResult.Success -> {
-                    result.data.forEach {
-                        Log.d("MainActivity", it.toString())
-                    }
-                }
-
-                is UCResult.Error ->
-                    Log.w("MainActivity", result.throwable)
-            }
-        }
-    }
-
-    override fun onDestroy() {
-        scope.cancel()
-        super.onDestroy()
     }
 
 }

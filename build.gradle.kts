@@ -4,3 +4,12 @@ plugins {
     id("org.jetbrains.kotlin.android") version "1.9.10" apply false
     kotlin("kapt") version "1.9.21"
 }
+
+buildscript {
+    repositories {
+        google()
+    }
+    dependencies {
+        classpath("androidx.navigation:navigation-safe-args-gradle-plugin:2.7.6")
+    }
+}
