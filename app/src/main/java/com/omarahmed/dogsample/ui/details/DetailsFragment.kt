@@ -43,7 +43,7 @@ class DetailsFragment : Fragment() {
             .placeholder(R.drawable.placeholder_dog)
             .into(binds.imgDog)
 
-        val breed = args.dog.breeds.first()
+        val breed = args.dog.breed
         val details = buildList {
             add("Breed" to breed.name)
             add("Group" to breed.group)

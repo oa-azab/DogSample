@@ -7,5 +7,5 @@ import kotlinx.parcelize.Parcelize
 data class Dog(
     val id: String,
     val image: String,
-    val breeds: List<Breed>
+    val breed: Breed
 ) : Parcelable

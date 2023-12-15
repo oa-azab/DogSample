@@ -14,33 +14,31 @@ class DogRemoteDataSource @Inject constructor(
         val response = dogService.getAll()
         val body = response.body()
         if (response.isSuccessful && body != null) {
-            return parse(body)
+            return parseResponse(body)
         } else {
             throw Exception("code = ${response.code()}, body = $body")
         }
     }
 
-    private fun parse(remoteList: List<RemoteDog>): List<Dog> {
+    private fun parseResponse(remoteList: List<RemoteDog>): List<Dog> {
         val returnList = mutableListOf<Dog>()
         for (item in remoteList) {
             val id = item.id ?: continue
             val image = item.image.orEmpty()
-            val breeds = item.breeds.orEmpty().map { convertBreed(it) }
-            returnList += Dog(id, image, breeds)
+            val breed = convertBreed(item.breeds?.firstOrNull())
+            returnList += Dog(id, image, breed)
         }
         return returnList.toList()
     }
 
-    private fun convertBreed(remoteBreed: RemoteBreed): Breed {
-        return with(remoteBreed) {
-            Breed(
-                id.orEmpty(),
-                name.orEmpty(),
-                group.orEmpty(),
-                lifeSpan.orEmpty(),
-                temperament.orEmpty()
-            )
-        }
+    private fun convertBreed(remoteBreed: RemoteBreed?): Breed {
+        return Breed(
+            remoteBreed?.id.orEmpty(),
+            remoteBreed?.name.orEmpty(),
+            remoteBreed?.group.orEmpty(),
+            remoteBreed?.lifeSpan.orEmpty(),
+            remoteBreed?.temperament.orEmpty()
+        )
     }
 
 }

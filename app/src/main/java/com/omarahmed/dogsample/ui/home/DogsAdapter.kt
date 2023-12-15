@@ -71,7 +71,7 @@ class DogsAdapter(
     class DogViewHolderList(private val binds: ItemDogBinding) : BaseDogViewHolder(binds.root) {
 
         override fun bind(dog: Dog, onItemClick: (Dog) -> Unit) {
-            binds.tvBreedName.text = dog.breeds.firstOrNull()?.name.orEmpty()
+            binds.tvBreedName.text = dog.breed.name
             Glide.with(binds.imgDog)
                 .load(dog.image)
                 .placeholder(R.drawable.placeholder_dog)
