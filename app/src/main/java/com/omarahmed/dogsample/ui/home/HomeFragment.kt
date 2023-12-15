@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.omarahmed.dogsample.App
 import com.omarahmed.dogsample.R
 import com.omarahmed.dogsample.databinding.FragmentHomeBinding

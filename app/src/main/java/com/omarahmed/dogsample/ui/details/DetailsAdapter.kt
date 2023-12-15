@@ -3,11 +3,7 @@ package com.omarahmed.dogsample.ui.details
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.omarahmed.dogsample.R
-import com.omarahmed.dogsample.databinding.ItemDogBinding
 import com.omarahmed.dogsample.databinding.ItemDogDetailsBinding
-import com.omarahmed.dogsample.model.Dog
 
 class DetailsAdapter(
     private val details: List<Pair<String, String>>,
