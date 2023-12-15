@@ -3,6 +3,7 @@ package com.omarahmed.dogsample.ui.home
 import android.util.Log
 import com.omarahmed.dogsample.UCResult
 import com.omarahmed.dogsample.domain.GetAllDogsUseCase
+import com.omarahmed.dogsample.yieldOrReturn
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
@@ -17,14 +18,12 @@ class HomePresenter(
         scope.launch {
             view.hideError()
             view.showLoading()
-            when (val result = getAllDogsUseCase.invoke()) {
+            when (val result = getAllDogsUseCase.invoke().yieldOrReturn()) {
                 is UCResult.Success -> {
                     view.hideLoading()
                     view.showResult(result.data)
 
-                    result.data.forEach {
-                        Log.d("MainActivity", it.toString())
-                    }
+                    result.data.forEach { Log.d("HomePresenter", it.toString()) }
                 }
 
                 is UCResult.Error -> {
@@ -33,7 +32,7 @@ class HomePresenter(
                     view.hideLoading()
                     view.showError(errorMessage)
 
-                    Log.w("MainActivity", result.throwable)
+                    Log.w("HomePresenter", result.throwable)
                 }
 
             }
@@ -41,6 +40,7 @@ class HomePresenter(
     }
 
     fun cancelScope() {
+        Log.d("HomePresenter", "cancelScope called")
         scope.cancel()
     }
 }

@@ -15,8 +15,8 @@
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/imgDog"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:scaleType="centerCrop"
             app:shapeAppearance="@style/ShapeAppearance.DogSample.DogImage"
             tools:src="@drawable/placeholder_dog" />
@@ -25,8 +25,9 @@
             android:id="@+id/tvBreedName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:layout_marginStart="16dp"
-            android:textAppearance="?attr/textAppearanceBodyLarge"
+            android:textAppearance="?attr/textAppearanceListItem"
             tools:text="Breed name" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>
