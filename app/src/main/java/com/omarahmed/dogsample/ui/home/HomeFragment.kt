@@ -48,9 +48,12 @@ class HomeFragment : Fragment(), HomeView {
         val getAllDogsUseCase =
             (activity?.application as App).appComponent.provideGetAllDogsUseCase()
 
+        // Setup click listeners
         binds.btnRetry.setOnClickListener { presenter.getDogs() }
         binds.btnChangeListType.setOnClickListener { onChangeListTypeClicked() }
+        binds.swipeRefresh.setOnRefreshListener { presenter.getDogs(true) }
 
+        // Setup Recyclerview
         binds.rvDogs.layoutManager = GridLayoutManager(context, 1)
         binds.rvDogs.addItemDecoration(AdaptiveSpacingItemDecoration(12.dpToPx))
         binds.rvDogs.adapter = dogsAdapter
@@ -70,11 +73,11 @@ class HomeFragment : Fragment(), HomeView {
     /*** HomeView ***/
 
     override fun showLoading() {
-        binds.progress.visibility = View.VISIBLE
+        binds.swipeRefresh.isRefreshing = true
     }
 
     override fun hideLoading() {
-        binds.progress.visibility = View.GONE
+        binds.swipeRefresh.isRefreshing = false
     }
 
     override fun showResult(data: List<Dog>) {

@@ -9,9 +9,9 @@ class GetAllDogsUseCase @Inject constructor(
     private val dogRepository: DogRepository
 ) {
 
-    suspend fun invoke(): UCResult<List<Dog>> {
+    suspend fun invoke(forceRefresh: Boolean = false): UCResult<List<Dog>> {
         return try {
-            val dogs = dogRepository.getAll()
+            val dogs = dogRepository.getAll(forceRefresh)
             UCResult.Success(dogs)
         } catch (t: Throwable) {
             UCResult.Error(t)

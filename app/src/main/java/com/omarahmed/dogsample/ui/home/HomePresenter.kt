@@ -14,11 +14,11 @@ class HomePresenter(
 ) {
     private val scope = MainScope()
 
-    fun getDogs() {
+    fun getDogs(forceRefresh: Boolean = false) {
         scope.launch {
             view.hideError()
             view.showLoading()
-            when (val result = getAllDogsUseCase.invoke().yieldOrReturn()) {
+            when (val result = getAllDogsUseCase.invoke(forceRefresh).yieldOrReturn()) {
                 is UCResult.Success -> {
                     view.hideLoading()
                     view.showResult(result.data)

@@ -11,7 +11,9 @@ class DogRepository @Inject constructor(
 
     private var cache: List<Dog>? = null
 
-    suspend fun getAll(): List<Dog> {
+    suspend fun getAll(forceRefresh: Boolean = false): List<Dog> {
+        if (forceRefresh) cache = null
+
         val cacheCopy = cache
         if (cacheCopy != null) return cacheCopy
 

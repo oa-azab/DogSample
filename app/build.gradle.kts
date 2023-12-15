@@ -58,6 +58,8 @@ dependencies {
 
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01")
+
     // Navigation
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.6")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.6")
