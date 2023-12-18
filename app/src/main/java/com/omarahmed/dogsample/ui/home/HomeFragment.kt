@@ -18,9 +18,12 @@ import com.omarahmed.dogsample.model.Dog
 import com.omarahmed.dogsample.model.ListType
 import com.omarahmed.dogsample.util.AdaptiveSpacingItemDecoration
 import com.omarahmed.dogsample.util.dpToPx
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
 
     private var listType: ListType = ListType.LIST
@@ -29,7 +32,7 @@ class HomeFragment : Fragment() {
     private val binds: FragmentHomeBinding
         get() = _binds!!
 
-    private val viewModel: DogsViewModel by viewModels { DogsViewModel.Factory }
+    private val viewModel: DogsViewModel by viewModels()
 
     private val dogsAdapter = DogsAdapter(listType) {
         navigateToDetails(it)

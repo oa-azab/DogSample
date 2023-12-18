@@ -4,6 +4,7 @@ plugins {
     id("org.jetbrains.kotlin.kapt")
     id("kotlin-parcelize")
     id("androidx.navigation.safeargs.kotlin")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -38,6 +39,9 @@ android {
     }
     buildFeatures {
         viewBinding = true
+    }
+    kapt {
+        correctErrorTypes = true
     }
 }
 
@@ -75,6 +79,10 @@ dependencies {
     implementation("com.google.dagger:dagger-android:2.49")
     implementation("com.google.dagger:dagger-android-support:2.49")
     kapt("com.google.dagger:dagger-android-processor:2.49")
+
+    // Hilt
+    implementation("com.google.dagger:hilt-android:2.49")
+    kapt("com.google.dagger:hilt-android-compiler:2.49")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

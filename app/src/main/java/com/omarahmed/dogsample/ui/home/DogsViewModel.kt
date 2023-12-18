@@ -1,19 +1,17 @@
 package com.omarahmed.dogsample.ui.home
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
-import com.omarahmed.dogsample.App
 import com.omarahmed.dogsample.UCResult
 import com.omarahmed.dogsample.domain.GetAllDogsUseCase
 import com.omarahmed.dogsample.model.Dog
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModel
 class DogsViewModel @Inject constructor(
     private val getAllDogsUseCase: GetAllDogsUseCase
 ) : ViewModel() {
@@ -43,24 +41,6 @@ class DogsViewModel @Inject constructor(
         data object Loading : UiState()
         data class Success(val dogs: List<Dog>) : UiState()
         data class Error(val exception: Throwable) : UiState()
-    }
-
-
-    companion object {
-
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(
-                modelClass: Class<T>,
-                extras: CreationExtras
-            ): T {
-                // Get the Application object from extras
-                val application = checkNotNull(extras[APPLICATION_KEY])
-                val getAllDogsUseCase = (application as App).appComponent.provideGetAllDogsUseCase()
-
-                return DogsViewModel(getAllDogsUseCase) as T
-            }
-        }
     }
 
 }

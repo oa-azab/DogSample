@@ -3,7 +3,9 @@ package com.omarahmed.dogsample.ui
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.omarahmed.dogsample.R
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
