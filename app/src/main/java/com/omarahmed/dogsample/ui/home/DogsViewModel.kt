@@ -30,8 +30,8 @@ class DogsViewModel @Inject constructor(
     fun getAll(forceRefresh: Boolean = false) {
         viewModelScope.launch {
             _uiState.value = UiState.Loading
-            when (val result = getAllDogsUseCase.invoke(forceRefresh)) {
-                is UCResult.Success -> _uiState.value = UiState.Success(result.data)
+            _uiState.value = when (val result = getAllDogsUseCase.invoke(forceRefresh)) {
+                is UCResult.Success -> UiState.Success(result.data)
                 is UCResult.Error -> UiState.Error(result.throwable)
             }
         }
