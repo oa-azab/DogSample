@@ -6,18 +6,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import com.omarahmed.dogsample.App
 import com.omarahmed.dogsample.R
 import com.omarahmed.dogsample.databinding.FragmentHomeBinding
 import com.omarahmed.dogsample.model.Dog
 import com.omarahmed.dogsample.model.ListType
 import com.omarahmed.dogsample.util.AdaptiveSpacingItemDecoration
 import com.omarahmed.dogsample.util.dpToPx
+import kotlinx.coroutines.launch
 
 
-class HomeFragment : Fragment(), HomeView {
+class HomeFragment : Fragment() {
 
     private var listType: ListType = ListType.LIST
 
@@ -25,7 +29,8 @@ class HomeFragment : Fragment(), HomeView {
     private val binds: FragmentHomeBinding
         get() = _binds!!
 
-    private lateinit var presenter: HomePresenter
+    private val viewModel: DogsViewModel by viewModels { DogsViewModel.Factory }
+
     private val dogsAdapter = DogsAdapter(listType) {
         navigateToDetails(it)
         Log.d("HomeFragment", "dog clicked $it")
@@ -44,13 +49,10 @@ class HomeFragment : Fragment(), HomeView {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val getAllDogsUseCase =
-            (activity?.application as App).appComponent.provideGetAllDogsUseCase()
-
         // Setup click listeners
-        binds.btnRetry.setOnClickListener { presenter.getDogs() }
+        binds.btnRetry.setOnClickListener { viewModel.getAll() }
         binds.btnChangeListType.setOnClickListener { onChangeListTypeClicked() }
-        binds.swipeRefresh.setOnRefreshListener { presenter.getDogs(true) }
+        binds.swipeRefresh.setOnRefreshListener { viewModel.getAll(true) }
 
         // Setup Recyclerview
         binds.rvDogs.layoutManager = GridLayoutManager(context, 1)
@@ -58,38 +60,34 @@ class HomeFragment : Fragment(), HomeView {
         binds.rvDogs.adapter = dogsAdapter
         updateListView()
 
-        presenter = HomePresenter(this, getAllDogsUseCase)
-        presenter.getDogs()
-    }
+        viewLifecycleOwner.lifecycleScope.launch {
 
-    override fun onDestroyView() {
-        _binds = null
-        presenter.cancelScope()
-        super.onDestroyView()
-    }
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
 
+                viewModel.uiState.collect { uiState ->
+                    // New value received
+                    when (uiState) {
+                        is DogsViewModel.UiState.Loading -> {
+                            binds.viewError.visibility = View.GONE
+                            binds.swipeRefresh.isRefreshing = true
+                        }
 
-    /*** HomeView ***/
+                        is DogsViewModel.UiState.Error -> {
+                            binds.swipeRefresh.isRefreshing = false
+                            binds.viewError.visibility = View.VISIBLE
+                            binds.tvErrorMessage.text = uiState.exception.localizedMessage
+                        }
 
-    override fun showLoading() {
-        binds.swipeRefresh.isRefreshing = true
-    }
+                        is DogsViewModel.UiState.Success -> {
+                            binds.viewError.visibility = View.GONE
+                            binds.swipeRefresh.isRefreshing = false
+                            dogsAdapter.updateData(uiState.dogs)
+                        }
+                    }
+                }
+            }
+        }
 
-    override fun hideLoading() {
-        binds.swipeRefresh.isRefreshing = false
-    }
-
-    override fun showResult(data: List<Dog>) {
-        dogsAdapter.updateData(data)
-    }
-
-    override fun showError(message: String) {
-        binds.viewError.visibility = View.VISIBLE
-        binds.tvErrorMessage.text = message
-    }
-
-    override fun hideError() {
-        binds.viewError.visibility = View.GONE
     }
 
 
