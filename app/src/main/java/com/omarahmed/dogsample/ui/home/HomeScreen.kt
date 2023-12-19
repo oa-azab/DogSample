@@ -1,5 +1,7 @@
 package com.omarahmed.dogsample.ui.home
 
+import android.annotation.SuppressLint
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,23 +10,32 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,6 +46,7 @@ import com.bumptech.glide.integration.compose.placeholder
 import com.omarahmed.dogsample.R
 import com.omarahmed.dogsample.model.Breed
 import com.omarahmed.dogsample.model.Dog
+import com.omarahmed.dogsample.model.ListType
 import com.omarahmed.dogsample.ui.theme.DogSampleTheme
 
 
@@ -45,92 +57,163 @@ fun HomeRoute(
 ) {
     HomeScreen(
         viewModel.uiState.collectAsStateWithLifecycle(),
+        viewModel.listType.collectAsStateWithLifecycle(),
         onRetry = { viewModel.getAll() },
         onDogClicked = { dog -> navToDetails(dog) }
-    )
+    ) { viewModel.changeListType() }
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
     uiState: State<DogsViewModel.UiState>,
+    listType: State<ListType>,
     onRetry: () -> Unit,
-    onDogClicked: (Dog) -> Unit
+    onDogClicked: (Dog) -> Unit,
+    onChangeListType: () -> Unit
 ) {
-    when (val state = uiState.value) {
-        is DogsViewModel.UiState.Success -> {
-            LazyColumn(
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                items(state.dogs) {
-                    DogItem(it) { dogClicked -> onDogClicked(dogClicked) }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(text = "Compose DogSample") },
+                actions = {
+                    IconButton(onClick = { onChangeListType() }) {
+                        val iconRes = when (listType.value) {
+                            ListType.LIST -> R.drawable.ic_grid_view
+                            ListType.GIRD -> R.drawable.ic_list_view
+                        }
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = iconRes),
+                            contentDescription = "Localized description"
+                        )
+                    }
                 }
-            }
+            )
         }
-
-        is DogsViewModel.UiState.Error -> {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Text(state.exception.localizedMessage)
-                Button(onClick = { onRetry() }) {
-                    Text("Retry")
+    ) { innerPadding ->
+        Box(modifier = Modifier.padding(innerPadding)) {
+            when (val state = uiState.value) {
+                is DogsViewModel.UiState.Success -> {
+                    val count = when (listType.value) {
+                        ListType.LIST -> 1
+                        ListType.GIRD -> 2
+                    }
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(count),
+                        contentPadding = PaddingValues(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        items(state.dogs) {
+                            DogItem(
+                                Modifier.animateItemPlacement(),
+                                it,
+                                listType
+                            ) { dogClicked -> onDogClicked(dogClicked) }
+                        }
+                    }
                 }
-            }
-        }
 
-        is DogsViewModel.UiState.Loading -> {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                CircularProgressIndicator()
+                is DogsViewModel.UiState.Error -> {
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Text(state.exception.localizedMessage)
+                        Button(onClick = { onRetry() }) {
+                            Text("Retry")
+                        }
+                    }
+                }
+
+                is DogsViewModel.UiState.Loading -> {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
             }
         }
     }
 
+
 }
+
+
+@Composable
+fun DogItem(
+    modifier: Modifier = Modifier,
+    dog: Dog,
+    listType: State<ListType>,
+    onClicked: (Dog) -> Unit
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onClicked(dog) }
+    ) {
+        when (listType.value) {
+            ListType.LIST -> DogItemList(dog)
+            ListType.GIRD -> DogItemGrid(dog)
+        }
+
+    }
+}
+
+@Composable
+@OptIn(ExperimentalGlideComposeApi::class)
+private fun DogItemGrid(dog: Dog) {
+    GlideImage(
+        modifier = Modifier
+            .height(160.dp)
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp)),
+        model = dog.image,
+        loading = placeholder(R.drawable.placeholder_dog),
+        failure = placeholder(R.drawable.placeholder_dog),
+        contentDescription = "DogImage",
+        contentScale = ContentScale.Crop
+    )
+}
+
+@Composable
+@OptIn(ExperimentalGlideComposeApi::class)
+private fun DogItemList(dog: Dog) {
+    Row(modifier = Modifier.padding(12.dp)) {
+        GlideImage(
+            modifier = Modifier
+                .size(80.dp, 80.dp)
+                .clip(RoundedCornerShape(8.dp)),
+            model = dog.image,
+            loading = placeholder(R.drawable.placeholder_dog),
+            failure = placeholder(R.drawable.placeholder_dog),
+            contentDescription = "DogImage",
+            contentScale = ContentScale.Crop
+        )
+        Text(
+            modifier = Modifier
+                .padding(start = 16.dp)
+                .align(Alignment.CenterVertically),
+            text = dog.breed.name,
+            style = MaterialTheme.typography.titleMedium
+        )
+    }
+}
+
 
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
     DogSampleTheme {
-        HomeScreen(mutableStateOf(DogsViewModel.UiState.Success(sampleDogs)), {}, {})
+        HomeScreen(
+            mutableStateOf(DogsViewModel.UiState.Success(sampleDogs)),
+            mutableStateOf(ListType.GIRD),
+            {}, {}, {})
     }
-}
-
-
-@OptIn(ExperimentalGlideComposeApi::class)
-@Composable
-fun DogItem(dog: Dog, onClicked: (Dog) -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClicked(dog) }
-    ) {
-        Row(modifier = Modifier.padding(12.dp)) {
-            GlideImage(
-                modifier = Modifier
-                    .size(80.dp, 80.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                model = dog.image,
-                loading = placeholder(R.drawable.placeholder_dog),
-                failure = placeholder(R.drawable.placeholder_dog),
-                contentDescription = "DogImage",
-                contentScale = ContentScale.Crop
-            )
-            Text(
-                modifier = Modifier
-                    .padding(start = 16.dp)
-                    .align(Alignment.CenterVertically),
-                text = dog.breed.name,
-                style = MaterialTheme.typography.titleMedium
-            )
-        }
-    }
-
 }
 
 
