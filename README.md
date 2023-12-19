@@ -10,6 +10,7 @@ Details screen shows more information about dog breed.
 |--|--|
 | [master](https://github.com/oa-azab/DogSample/tree/master) | MVP |
 | [viewmodel](https://github.com/oa-azab/DogSample/tree/viewmodel) | MVVM |
+| [compose](https://github.com/oa-azab/DogSample/tree/compose) | Compose UI |
 
 # Architecture
 
