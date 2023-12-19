@@ -16,12 +16,8 @@ class DogsViewModel @Inject constructor(
     private val getAllDogsUseCase: GetAllDogsUseCase
 ) : ViewModel() {
 
-    // Backing property to avoid state updates from other classes
     private val _uiState = MutableStateFlow<UiState>(UiState.Success(emptyList()))
-
-    // The UI collects from this StateFlow to get its state updates
     val uiState: StateFlow<UiState> = _uiState
-
 
     init {
         getAll()
