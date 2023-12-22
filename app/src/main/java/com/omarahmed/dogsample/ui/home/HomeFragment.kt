@@ -57,6 +57,7 @@ class HomeFragment : Fragment(), HomeView {
         binds.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
             override fun onQueryTextSubmit(query: String?): Boolean {
+                Log.d("onQueryTextSubmit", "query = $query")
                 val filterQuery = query.orEmpty()
                 if (filterQuery.isNotBlank()) {
                     presenter.filter(filterQuery)
@@ -67,6 +68,11 @@ class HomeFragment : Fragment(), HomeView {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
+                if (newText != null && newText.isBlank()) {
+                    presenter.getDogs()
+                    return true
+                }
+
                 return false
             }
 
