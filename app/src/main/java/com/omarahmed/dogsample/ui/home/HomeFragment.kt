@@ -5,6 +5,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SearchView
+import androidx.appcompat.widget.SearchView.OnQueryTextListener
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -51,6 +53,24 @@ class HomeFragment : Fragment(), HomeView {
         binds.btnRetry.setOnClickListener { presenter.getDogs() }
         binds.btnChangeListType.setOnClickListener { onChangeListTypeClicked() }
         binds.swipeRefresh.setOnRefreshListener { presenter.getDogs(true) }
+
+        binds.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                val filterQuery = query.orEmpty()
+                if (filterQuery.isNotBlank()) {
+                    presenter.filter(filterQuery)
+                    return true
+                }
+
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                return false
+            }
+
+        })
 
         // Setup Recyclerview
         binds.rvDogs.layoutManager = GridLayoutManager(context, 1)
