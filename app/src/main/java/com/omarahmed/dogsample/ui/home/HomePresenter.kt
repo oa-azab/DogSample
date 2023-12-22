@@ -15,19 +15,13 @@ class HomePresenter(
 ) {
     private val scope = MainScope()
 
-    private val originalData: MutableList<Dog> = mutableListOf()
-    private val filteredData: MutableList<Dog> = mutableListOf()
 
-    fun getDogs(forceRefresh: Boolean = false) {
+    fun getDogs(forceRefresh: Boolean = false, filterTerm: String = "") {
         scope.launch {
             view.hideError()
             view.showLoading()
-            when (val result = getAllDogsUseCase.invoke(forceRefresh).yieldOrReturn()) {
+            when (val result = getAllDogsUseCase.invoke(forceRefresh, filterTerm).yieldOrReturn()) {
                 is UCResult.Success -> {
-
-                    originalData.clear()
-                    originalData.addAll(result.data)
-
                     view.hideLoading()
                     view.showResult(result.data)
 
@@ -45,21 +39,6 @@ class HomePresenter(
 
             }
         }
-    }
-
-    fun filter(filterTerm: String) {
-        view.showLoading()
-
-        filteredData.clear()
-        filteredData.addAll(originalData.filter {
-            it.breed.name.contains(
-                filterTerm,
-                ignoreCase = true
-            )
-        })
-
-        view.hideLoading()
-        view.showResult(filteredData)
     }
 
     fun cancelScope() {

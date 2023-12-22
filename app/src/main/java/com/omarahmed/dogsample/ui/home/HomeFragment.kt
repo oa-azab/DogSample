@@ -60,7 +60,7 @@ class HomeFragment : Fragment(), HomeView {
                 Log.d("onQueryTextSubmit", "query = $query")
                 val filterQuery = query.orEmpty()
                 if (filterQuery.isNotBlank()) {
-                    presenter.filter(filterQuery)
+                    presenter.getDogs(filterTerm = filterQuery)
                     return true
                 }
 
